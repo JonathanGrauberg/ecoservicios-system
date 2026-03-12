@@ -1,4 +1,4 @@
-import React from "react"
+import React from 'react'
 import { AppSidebar } from '@/components/app-sidebar'
 
 export default function DashboardLayout({
@@ -9,7 +9,7 @@ export default function DashboardLayout({
   return (
     <div className="min-h-screen bg-background">
       <AppSidebar />
-      <main className="ml-64 min-h-screen">
+      <main className="min-h-screen lg:ml-64">
         {children}
       </main>
     </div>

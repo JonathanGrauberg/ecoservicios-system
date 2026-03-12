@@ -84,7 +84,8 @@ export default function DashboardPage() {
     )
   }
 
-  const { stats, recentBudgets } = data
+  const { stats, recentBudgets } = data ?? {}
+  const budgets = recentBudgets ?? []
 
   return (
     <div className="min-h-screen">
@@ -98,37 +99,37 @@ export default function DashboardPage() {
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
           <StatCard
             title="Clientes"
-            value={stats.totalClients}
+            value={stats?.totalClients ?? 0}
             icon={Users}
             description="Registrados"
           />
           <StatCard
             title="Servicios"
-            value={stats.totalProducts}
+            value={stats?.totalProducts ?? 0}
             icon={Package}
             description="Activos"
           />
           <StatCard
             title="Presupuestos"
-            value={stats.totalBudgets}
+            value={stats?.totalBudgets ?? 0}
             icon={FileText}
             description="Creados"
           />
           <StatCard
             title="Aprobados"
-            value={stats.approvedBudgets}
+            value={stats?.approvedBudgets ?? 0}
             icon={CheckCircle}
             description="Confirmados"
           />
           <StatCard
             title="Pendientes"
-            value={stats.pendingBudgets}
+            value={stats?.pendingBudgets ?? 0}
             icon={Clock}
             description="En gestión"
           />
           <StatCard
             title="Ingresos"
-            value={formatCurrency(stats.totalRevenue)}
+            value={formatCurrency(stats?.totalRevenue ?? 0)}
             icon={DollarSign}
             description="Aprobados"
           />
@@ -147,13 +148,13 @@ export default function DashboardPage() {
           </CardHeader>
 
           <CardContent>
-            {recentBudgets.length === 0 ? (
+            {budgets.length === 0 ? (
               <p className="py-8 text-center text-muted-foreground">
                 No hay presupuestos creados aún
               </p>
             ) : (
               <div className="space-y-4">
-                {recentBudgets.map((budget: DashboardBudget) => (
+                {budgets.map((budget: DashboardBudget) => (
                   <Link
                     key={budget.id}
                     href={`/budgets/${budget.id}`}
