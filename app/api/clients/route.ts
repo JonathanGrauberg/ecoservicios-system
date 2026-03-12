@@ -21,13 +21,13 @@ export async function POST(request: Request) {
     const data = await request.json()
 
     const name = typeof data?.name === 'string' ? data.name.trim() : ''
-    const company = typeof data?.company === 'string' ? data.company.trim() : ''
+    const company = typeof data?.company === 'string' && data.company.trim() ? data.company.trim() : null
     const email = typeof data?.email === 'string' ? data.email.trim() : ''
     const phone = typeof data?.phone === 'string' ? data.phone.trim() : ''
 
-    if (!name || !company || !email || !phone) {
+    if (!name || !email || !phone) {
       return NextResponse.json(
-        { error: 'Missing required fields', missing: ['name', 'company', 'email', 'phone'] },
+        { error: 'Missing required fields', missing: ['name', 'email', 'phone'] },
         { status: 400 }
       )
     }
