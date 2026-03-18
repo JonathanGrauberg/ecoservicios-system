@@ -38,7 +38,7 @@ import { ProductForm } from '@/components/product-form'
 import useSWR, { mutate } from 'swr'
 import type { ProductService, ProductCategory } from '@/lib/types'
 import { CATEGORY_LABELS } from '@/lib/types'
-import { useSearchParams } from 'next/navigation'
+
 
 async function fetchProducts() {
   const res = await fetch('/api/products')
@@ -66,7 +66,7 @@ function Loading() {
 }
 
 export default function ProductsPage() {
-  const searchParams = useSearchParams()
+  
   const { data: products = [], isLoading } = useSWR<ProductService[]>('/api/products', fetchProducts)
   const [searchQuery, setSearchQuery] = useState('')
   const [categoryFilter, setCategoryFilter] = useState<string>('all')
