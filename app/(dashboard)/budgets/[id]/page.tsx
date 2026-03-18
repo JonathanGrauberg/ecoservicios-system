@@ -226,162 +226,205 @@ export default function BudgetDetailPage() {
       : Number(budget.shippingCost)
 
   return (
-    <TooltipProvider>
-      <div className="min-h-screen">
-        <PageHeader
-          title={`Presupuesto #${budget.id.slice(0, 6).toUpperCase()}`}
-          description={`Creado el ${formatDate(budget.createdAt)}`}
-        >
-          <Link href="/budgets">
-            <Button variant="outline">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Volver
+  <TooltipProvider>
+    <div className="min-h-screen">
+      <PageHeader
+        title={`Presupuesto #${budget.id.slice(0, 6).toUpperCase()}`}
+        description={`Creado el ${formatDate(budget.createdAt)}`}
+      >
+        <Link href="/budgets" className="w-full sm:w-auto">
+          <Button variant="outline" className="w-full sm:w-auto">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Volver
+          </Button>
+        </Link>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              onClick={handleGeneratePDF}
+              disabled={isGeneratingPDF}
+              className="w-full sm:w-auto"
+            >
+              <Download className="mr-2 h-4 w-4" />
+              {isGeneratingPDF ? 'Generando...' : 'Descargar PDF'}
             </Button>
-          </Link>
+          </TooltipTrigger>
+          <TooltipContent>Generar y descargar PDF del presupuesto</TooltipContent>
+        </Tooltip>
+      </PageHeader>
 
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button onClick={handleGeneratePDF} disabled={isGeneratingPDF}>
-                <Download className="mr-2 h-4 w-4" />
-                {isGeneratingPDF ? 'Generando...' : 'Descargar PDF'}
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Generar y descargar PDF del presupuesto</TooltipContent>
-          </Tooltip>
-        </PageHeader>
-
-        <div className="p-8">
-          <div className="grid gap-8 lg:grid-cols-3">
-            {/* MAIN */}
-            <div className="space-y-6 lg:col-span-2">
-              {/* Cliente */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Información del Cliente</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {budget.client ? (
-                    <div className="grid gap-4 sm:grid-cols-2">
-                      <div>
-                        <p className="text-lg font-semibold">{budget.client.name}</p>
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <Building2 className="h-4 w-4" />
-                          {budget.client.company}
-                        </div>
-                      </div>
-
-                      <div className="space-y-2 text-sm">
-                        <div className="flex items-center gap-2 text-muted-foreground">
-                          <Mail className="h-4 w-4" />
-                          {budget.client.email}
-                        </div>
-                        <div className="flex items-center gap-2 text-muted-foreground">
-                          <Phone className="h-4 w-4" />
-                          {budget.client.phone}
-                        </div>
-                        {budget.client.address && (
-                          <div className="flex items-center gap-2 text-muted-foreground">
-                            <MapPin className="h-4 w-4" />
-                            {budget.client.address}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ) : (
-                    <p className="text-muted-foreground">Cliente no encontrado</p>
-                  )}
-                </CardContent>
-              </Card>
-
-              {/* Datos comerciales / operativos */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Asignaciones</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4 text-sm">
+      <div className="p-4 md:p-6 lg:p-8">
+        <div className="grid gap-4 md:gap-6 lg:grid-cols-3 lg:gap-8">
+          {/* MAIN */}
+          <div className="space-y-4 md:space-y-6 lg:col-span-2">
+            {/* Cliente */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base sm:text-lg">Información del Cliente</CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0">
+                {budget.client ? (
                   <div className="grid gap-4 sm:grid-cols-2">
-                    <div className="rounded-md border p-3">
-                      <div className="mb-1 flex items-center gap-2 text-muted-foreground">
-                        <User className="h-4 w-4" />
-                        <span>Vendedor</span>
+                    <div>
+                      <p className="text-base font-semibold sm:text-lg">{budget.client.name}</p>
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Building2 className="h-4 w-4 shrink-0" />
+                        <span>{budget.client.company || 'Sin empresa'}</span>
                       </div>
-                      <p className="font-medium">
-                        {budget.seller
-                          ? `${budget.seller.name} ${budget.seller.lastName}`
-                          : 'Sin asignar'}
-                      </p>
                     </div>
 
-                    <div className="rounded-md border p-3">
-                      <div className="mb-1 flex items-center gap-2 text-muted-foreground">
-                        <Wrench className="h-4 w-4" />
-                        <span>Responsable de instalación</span>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <Mail className="h-4 w-4 shrink-0" />
+                        <span className="break-all">{budget.client.email}</span>
                       </div>
-                      <p className="font-medium">
-                        {budget.installationResponsible === 'company'
-                          ? 'A cargo de Ecoservicios'
-                          : budget.installationResponsible === 'client'
-                            ? 'A cargo del cliente'
-                            : budget.installationResponsible === 'other'
-                              ? 'Otro'
-                              : 'Sin definir'}
-                      </p>
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <Phone className="h-4 w-4 shrink-0" />
+                        <span>{budget.client.phone}</span>
+                      </div>
+                      {budget.client.address && (
+                        <div className="flex items-start gap-2 text-muted-foreground">
+                          <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
+                          <span>{budget.client.address}</span>
+                        </div>
+                      )}
                     </div>
                   </div>
+                ) : (
+                  <p className="text-muted-foreground">Cliente no encontrado</p>
+                )}
+              </CardContent>
+            </Card>
 
+            {/* Datos comerciales / operativos */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base sm:text-lg">Asignaciones</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 pt-0 text-sm">
+                <div className="grid gap-3 sm:grid-cols-2">
                   <div className="rounded-md border p-3">
-                    <p className="mb-1 text-muted-foreground">Instalador asignado</p>
-
+                    <div className="mb-1 flex items-center gap-2 text-muted-foreground">
+                      <User className="h-4 w-4 shrink-0" />
+                      <span>Vendedor</span>
+                    </div>
                     <p className="font-medium">
-                      {budget.installer
-                        ? `${budget.installer.name} ${budget.installer.lastName}`
+                      {budget.seller
+                        ? `${budget.seller.name} ${budget.seller.lastName}`
                         : 'Sin asignar'}
                     </p>
-
-                    {budget.installer?.phone && (
-                      <p className="mt-1 text-muted-foreground">
-                        Tel: {budget.installer.phone}
-                      </p>
-                    )}
-
-                    {budget.installer?.city && (
-                      <p className="text-muted-foreground">
-                        Ciudad: {budget.installer.city}
-                      </p>
-                    )}
                   </div>
 
                   <div className="rounded-md border p-3">
-                    <p className="mb-1 text-muted-foreground">Referencia del instalador</p>
-                    <p className="whitespace-pre-wrap">
-                      {budget.installerReference?.trim()
-                        ? budget.installerReference
-                        : '—'}
+                    <div className="mb-1 flex items-center gap-2 text-muted-foreground">
+                      <Wrench className="h-4 w-4 shrink-0" />
+                      <span>Responsable de instalación</span>
+                    </div>
+                    <p className="font-medium">
+                      {budget.installationResponsible === 'company'
+                        ? 'A cargo de Ecoservicios'
+                        : budget.installationResponsible === 'client'
+                          ? 'A cargo del cliente'
+                          : budget.installationResponsible === 'other'
+                            ? 'Otro'
+                            : 'Sin definir'}
                     </p>
                   </div>
+                </div>
 
-                  {budget.siteDetails?.trim() && (
-                    <div className="rounded-md border p-3">
-                      <p className="mb-1 text-muted-foreground">Datos del lugar / uso</p>
-                      <p className="whitespace-pre-wrap">{budget.siteDetails}</p>
-                    </div>
+                <div className="rounded-md border p-3">
+                  <p className="mb-1 text-muted-foreground">Instalador asignado</p>
+
+                  <p className="font-medium">
+                    {budget.installer
+                      ? `${budget.installer.name} ${budget.installer.lastName}`
+                      : 'Sin asignar'}
+                  </p>
+
+                  {budget.installer?.phone && (
+                    <p className="mt-1 text-muted-foreground">
+                      Tel: {budget.installer.phone}
+                    </p>
                   )}
 
-                  {budget.technicalDetails?.trim() && (
-                    <div className="rounded-md border p-3">
-                      <p className="mb-1 text-muted-foreground">Observaciones técnicas</p>
-                      <p className="whitespace-pre-wrap">{budget.technicalDetails}</p>
-                    </div>
+                  {budget.installer?.city && (
+                    <p className="text-muted-foreground">
+                      Ciudad: {budget.installer.city}
+                    </p>
                   )}
-                </CardContent>
-              </Card>
+                </div>
 
-              {/* Items */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Detalle de Items</CardTitle>
-                </CardHeader>
-                <CardContent className="p-0">
+                <div className="rounded-md border p-3">
+                  <p className="mb-1 text-muted-foreground">Referencia del instalador</p>
+                  <p className="whitespace-pre-wrap break-words">
+                    {budget.installerReference?.trim() ? budget.installerReference : '—'}
+                  </p>
+                </div>
+
+                {budget.siteDetails?.trim() && (
+                  <div className="rounded-md border p-3">
+                    <p className="mb-1 text-muted-foreground">Datos del lugar / uso</p>
+                    <p className="whitespace-pre-wrap break-words">{budget.siteDetails}</p>
+                  </div>
+                )}
+
+                {budget.technicalDetails?.trim() && (
+                  <div className="rounded-md border p-3">
+                    <p className="mb-1 text-muted-foreground">Observaciones técnicas</p>
+                    <p className="whitespace-pre-wrap break-words">{budget.technicalDetails}</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Items */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base sm:text-lg">Detalle de Items</CardTitle>
+              </CardHeader>
+
+              {/* MOBILE */}
+              <CardContent className="space-y-3 pt-0 md:hidden">
+                {budget.items.map((item) => (
+                  <div key={item.id} className="rounded-md border p-3">
+                    <div className="space-y-1">
+                      <p className="font-medium">
+                        {item.productService?.name ?? 'Producto no encontrado'}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {CATEGORY_LABELS[item.productService?.category || 'other']}
+                      </p>
+                    </div>
+
+                    <div className="mt-3 space-y-2 text-sm">
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="text-muted-foreground">Cantidad</span>
+                        <span>{item.quantity}</span>
+                      </div>
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="text-muted-foreground">Precio unit.</span>
+                        <span>{formatCurrency(item.unitPrice)}</span>
+                      </div>
+                      <div className="flex items-center justify-between gap-3 font-medium">
+                        <span className="text-muted-foreground">Subtotal</span>
+                        <span>{formatCurrency(item.subtotal)}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+
+                <div className="rounded-md border bg-muted/50 p-3">
+                  <div className="flex items-center justify-between gap-3 text-base font-bold text-primary">
+                    <span>Total</span>
+                    <span>{formatCurrency(budget.total)}</span>
+                  </div>
+                </div>
+              </CardContent>
+
+              {/* DESKTOP */}
+              <CardContent className="hidden p-0 md:block">
+                <div className="w-full overflow-x-auto">
                   <Table>
                     <TableHeader>
                       <TableRow>
@@ -422,138 +465,145 @@ export default function BudgetDetailPage() {
                       </TableRow>
                     </TableBody>
                   </Table>
-                </CardContent>
-              </Card>
-            </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
 
-            {/* SIDEBAR */}
-            <div>
-              <Card className="sticky top-8">
-                <CardHeader>
-                  <CardTitle>Estado del Presupuesto</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <Badge className={STATUS_COLORS[budget.status]}>
-                    {STATUS_LABELS[budget.status]}
-                  </Badge>
+          {/* SIDEBAR */}
+          <div className="space-y-4 md:space-y-6">
+            <Card className="lg:sticky lg:top-8">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base sm:text-lg">Estado del Presupuesto</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4 pt-0">
+                <Badge className={STATUS_COLORS[budget.status]}>
+                  {STATUS_LABELS[budget.status]}
+                </Badge>
 
-                  <Select
-                    value={budget.status}
-                    onValueChange={(v) => handleStatusChange(v as BudgetStatus)}
-                    disabled={isUpdating}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {Object.entries(STATUS_LABELS).map(([value, label]) => (
-                        <SelectItem key={value} value={value}>
-                          {label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </CardContent>
-              </Card>
+                <Select
+                  value={budget.status}
+                  onValueChange={(v) => handleStatusChange(v as BudgetStatus)}
+                  disabled={isUpdating}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.entries(STATUS_LABELS).map(([value, label]) => (
+                      <SelectItem key={value} value={value}>
+                        {label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </CardContent>
+            </Card>
 
-              <Card className="mt-6">
-                <CardHeader>
-                  <CardTitle>Resumen</CardTitle>
-                </CardHeader>
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base sm:text-lg">Resumen</CardTitle>
+              </CardHeader>
 
-                <CardContent className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Subtotal</span>
-                    <span>{formatCurrency(budget.subtotal)}</span>
+              <CardContent className="space-y-2 pt-0 text-sm">
+                <div className="flex justify-between gap-3">
+                  <span className="text-muted-foreground">Subtotal</span>
+                  <span>{formatCurrency(budget.subtotal)}</span>
+                </div>
+
+                {discount > 0 && (
+                  <div className="flex justify-between gap-3 text-red-600">
+                    <span>Descuento</span>
+                    <span>- {formatCurrency(discount)}</span>
                   </div>
+                )}
 
-                  {discount > 0 && (
-                    <div className="flex justify-between text-red-600">
-                      <span>Descuento</span>
-                      <span>- {formatCurrency(discount)}</span>
-                    </div>
-                  )}
-
-                  {tax > 0 && (
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">IVA</span>
-                      <span>{formatCurrency(tax)}</span>
-                    </div>
-                  )}
-
-                  {(shippingCost ?? 0) > 0 && (
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Envío</span>
-                      <span>{formatCurrency(shippingCost ?? 0)}</span>
-                    </div>
-                  )}
-
-                  <div className="border-t pt-2 mt-2 flex justify-between font-bold text-lg text-primary">
-                    <span>Total</span>
-                    <span>{formatCurrency(budget.total)}</span>
+                {tax > 0 && (
+                  <div className="flex justify-between gap-3">
+                    <span className="text-muted-foreground">IVA</span>
+                    <span>{formatCurrency(tax)}</span>
                   </div>
+                )}
 
-                  {budget.notes?.trim() && (
-                    <div className="pt-4">
-                      <p className="text-xs text-muted-foreground">Nota</p>
-                      <p className="whitespace-pre-wrap">{budget.notes}</p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
+                {(shippingCost ?? 0) > 0 && (
+                  <div className="flex justify-between gap-3">
+                    <span className="text-muted-foreground">Envío</span>
+                    <span>{formatCurrency(shippingCost ?? 0)}</span>
+                  </div>
+                )}
+
+                <div className="mt-2 flex justify-between gap-3 border-t pt-2 text-base font-bold text-primary sm:text-lg">
+                  <span>Total</span>
+                  <span>{formatCurrency(budget.total)}</span>
+                </div>
+
+                {budget.notes?.trim() && (
+                  <div className="pt-4">
+                    <p className="text-xs text-muted-foreground">Nota</p>
+                    <p className="whitespace-pre-wrap break-words">{budget.notes}</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </div>
         </div>
-
-        <Dialog open={stockModalOpen} onOpenChange={setStockModalOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Hay productos sin stock</DialogTitle>
-              <DialogDescription>
-                Podés ir a Stock para ajustar cantidades, o aprobar igual y luego comprar el
-                material.
-              </DialogDescription>
-            </DialogHeader>
-
-            {hasStockProblems ? (
-              <div className="mt-2 rounded-md border p-3 text-sm">
-                <ul className="list-disc pl-5 space-y-1">
-                  {stockProblems.map((p) => (
-                    <li key={p.productServiceId}>
-                      <span className="font-medium">{p.name}</span> — faltan{' '}
-                      <span className="font-semibold">{p.missing}</span>{' '}
-                      <span className="text-muted-foreground">
-                        (pedido {p.requested} / stock {p.available})
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ) : (
-              <p className="text-sm text-muted-foreground">
-                No pudimos obtener el detalle del faltante.
-              </p>
-            )}
-
-            <DialogFooter className="mt-4 gap-2 sm:gap-0">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => {
-                  setStockModalOpen(false)
-                  router.push('/stock')
-                }}
-              >
-                Ir a Stock
-              </Button>
-
-              <Button type="button" onClick={approveAnyway} disabled={isUpdating}>
-                {isUpdating ? 'Aprobando…' : 'Aprobar igual'}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
       </div>
-    </TooltipProvider>
-  )
+
+      <Dialog open={stockModalOpen} onOpenChange={setStockModalOpen}>
+        <DialogContent className="max-w-[92vw] sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Hay productos sin stock</DialogTitle>
+            <DialogDescription>
+              Podés ir a Stock para ajustar cantidades, o aprobar igual y luego comprar el
+              material.
+            </DialogDescription>
+          </DialogHeader>
+
+          {hasStockProblems ? (
+            <div className="mt-2 rounded-md border p-3 text-sm">
+              <ul className="list-disc space-y-1 pl-5">
+                {stockProblems.map((p) => (
+                  <li key={p.productServiceId}>
+                    <span className="font-medium">{p.name}</span> — faltan{' '}
+                    <span className="font-semibold">{p.missing}</span>{' '}
+                    <span className="text-muted-foreground">
+                      (pedido {p.requested} / stock {p.available})
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              No pudimos obtener el detalle del faltante.
+            </p>
+          )}
+
+          <DialogFooter className="mt-4 flex-col gap-2 sm:flex-row sm:gap-0">
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full sm:w-auto"
+              onClick={() => {
+                setStockModalOpen(false)
+                router.push('/stock')
+              }}
+            >
+              Ir a Stock
+            </Button>
+
+            <Button
+              type="button"
+              onClick={approveAnyway}
+              disabled={isUpdating}
+              className="w-full sm:w-auto"
+            >
+              {isUpdating ? 'Aprobando…' : 'Aprobar igual'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  </TooltipProvider>
+)
 }

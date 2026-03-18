@@ -1,24 +1,17 @@
 import { NextResponse } from 'next/server'
-import { 
+import {
   getDashboardStats,
   getRecentBudgets,
   getMonthlyRevenue,
-  getBudgetStatusStats
+  getBudgetStatusStats,
 } from '@/lib/dashboard-store'
 
 export async function GET() {
   try {
-    const [
-      stats,
-      recentBudgets,
-      revenue,
-      statusStats
-    ] = await Promise.all([
-      getDashboardStats(),
-      getRecentBudgets(5),
-      getMonthlyRevenue(),
-      getBudgetStatusStats()
-    ])
+    const stats = await getDashboardStats()
+    const recentBudgets = await getRecentBudgets(5)
+    const revenue = await getMonthlyRevenue()
+    const statusStats = await getBudgetStatusStats()
 
     return NextResponse.json({
       stats,

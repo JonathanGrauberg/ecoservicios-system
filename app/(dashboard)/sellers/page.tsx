@@ -20,11 +20,10 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog'
 import { Switch } from '@/components/ui/switch'
 import { Badge } from '@/components/ui/badge'
-import { Pencil, Plus, Trash2 } from 'lucide-react'
+import { Pencil, Plus, Trash2, Mail, Phone, MapPin, Briefcase } from 'lucide-react'
 
 type Seller = {
   id: string
@@ -108,7 +107,6 @@ export default function SellersPage() {
     try {
       const payload = {
         ...form,
-        // normalizamos strings vacíos a null para DB
         dni: form.dni.trim() ? form.dni.trim() : null,
         email: form.email.trim() ? form.email.trim() : null,
         phone: form.phone.trim() ? form.phone.trim() : null,
@@ -143,11 +141,13 @@ export default function SellersPage() {
 
   const onDisable = async (id: string) => {
     if (!confirm('¿Desactivar vendedor?')) return
+
     const res = await fetch(`/api/sellers/${id}`, { method: 'DELETE' })
     if (!res.ok) {
       alert('No se pudo desactivar')
       return
     }
+
     await fetchSellers()
   }
 
@@ -162,16 +162,17 @@ export default function SellersPage() {
         title="Vendedores"
         description={`Activos: ${activeCount}`}
       >
-        <Button onClick={openCreate}>
+        <Button onClick={openCreate} className="w-full sm:w-auto">
           <Plus className="mr-2 h-4 w-4" />
           Nuevo vendedor
         </Button>
       </PageHeader>
 
-      <div className="p-8 space-y-6">
+      <div className="space-y-6 p-4 md:p-6 lg:p-8">
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
+          <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <CardTitle>Listado</CardTitle>
+
             <div className="flex items-center gap-2 text-sm">
               <span className="text-muted-foreground">Ver inactivos</span>
               <Switch
@@ -182,69 +183,157 @@ export default function SellersPage() {
           </CardHeader>
 
           <CardContent className="p-0">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Nombre</TableHead>
-                  <TableHead>Sector</TableHead>
-                  <TableHead>Contacto</TableHead>
-                  <TableHead className="text-center">Estado</TableHead>
-                  <TableHead className="text-right">Acciones</TableHead>
-                </TableRow>
-              </TableHeader>
+            {loading ? (
+              <div className="py-10 text-center text-muted-foreground">
+                Cargando...
+              </div>
+            ) : sellers.length === 0 ? (
+              <div className="py-10 text-center text-muted-foreground">
+                No hay vendedores
+              </div>
+            ) : (
+              <>
+                {/* MOBILE: cards */}
+                <div className="space-y-4 p-4 md:hidden">
+                  {sellers.map((s) => (
+                    <Card key={s.id} className={!s.active ? 'opacity-60' : ''}>
+                      <CardContent className="space-y-4 p-4">
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <p className="font-medium text-card-foreground">
+                              {s.name} {s.lastName}
+                            </p>
 
-              <TableBody>
-                {loading ? (
-                  <TableRow>
-                    <TableCell colSpan={5} className="py-10 text-center text-muted-foreground">
-                      Cargando...
-                    </TableCell>
-                  </TableRow>
-                ) : sellers.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={5} className="py-10 text-center text-muted-foreground">
-                      No hay vendedores
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  sellers.map((s) => (
-                    <TableRow key={s.id} className={!s.active ? 'opacity-60' : ''}>
-                      <TableCell className="font-medium">
-                        {s.name} {s.lastName}
-                      </TableCell>
-                      <TableCell>{s.sector || '—'}</TableCell>
-                      <TableCell className="text-sm text-muted-foreground">
-                        {s.email || s.phone || '—'}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <Badge className={s.active ? 'bg-green-100 text-green-800' : 'bg-muted text-muted-foreground'}>
-                          {s.active ? 'Activo' : 'Inactivo'}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right space-x-2">
-                        <Button variant="outline" size="sm" onClick={() => openEdit(s)}>
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => onDisable(s.id)}
-                          disabled={!s.active}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
+                            <div className="mt-1 flex items-center gap-2 text-sm text-muted-foreground">
+                              <Briefcase className="h-4 w-4 shrink-0" />
+                              <span>{s.sector || 'Sin sector'}</span>
+                            </div>
+                          </div>
+
+                          <Badge
+                            className={
+                              s.active
+                                ? 'bg-green-100 text-green-800'
+                                : 'bg-muted text-muted-foreground'
+                            }
+                          >
+                            {s.active ? 'Activo' : 'Inactivo'}
+                          </Badge>
+                        </div>
+
+                        <div className="space-y-2 text-sm">
+                          <div className="flex items-center gap-2 text-muted-foreground">
+                            <Mail className="h-4 w-4 shrink-0" />
+                            <span className="break-all">{s.email || 'Sin email'}</span>
+                          </div>
+
+                          <div className="flex items-center gap-2 text-muted-foreground">
+                            <Phone className="h-4 w-4 shrink-0" />
+                            <span>{s.phone || 'Sin teléfono'}</span>
+                          </div>
+
+                          {(s.city || s.province) && (
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                              <MapPin className="h-4 w-4 shrink-0" />
+                              <span>
+                                {[s.city, s.province].filter(Boolean).join(', ')}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="flex gap-2">
+                          <Button
+                            variant="outline"
+                            className="flex-1"
+                            onClick={() => openEdit(s)}
+                          >
+                            <Pencil className="mr-2 h-4 w-4" />
+                            Editar
+                          </Button>
+
+                          <Button
+                            variant="outline"
+                            className="flex-1"
+                            onClick={() => onDisable(s.id)}
+                            disabled={!s.active}
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Desactivar
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+
+                {/* DESKTOP/TABLET: table */}
+                <div className="hidden md:block">
+                  <div className="w-full overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Nombre</TableHead>
+                          <TableHead>Sector</TableHead>
+                          <TableHead>Contacto</TableHead>
+                          <TableHead className="text-center">Estado</TableHead>
+                          <TableHead className="text-right">Acciones</TableHead>
+                        </TableRow>
+                      </TableHeader>
+
+                      <TableBody>
+                        {sellers.map((s) => (
+                          <TableRow key={s.id} className={!s.active ? 'opacity-60' : ''}>
+                            <TableCell className="font-medium">
+                              {s.name} {s.lastName}
+                            </TableCell>
+
+                            <TableCell>{s.sector || '—'}</TableCell>
+
+                            <TableCell className="text-sm text-muted-foreground">
+                              {s.email || s.phone || '—'}
+                            </TableCell>
+
+                            <TableCell className="text-center">
+                              <Badge
+                                className={
+                                  s.active
+                                    ? 'bg-green-100 text-green-800'
+                                    : 'bg-muted text-muted-foreground'
+                                }
+                              >
+                                {s.active ? 'Activo' : 'Inactivo'}
+                              </Badge>
+                            </TableCell>
+
+                            <TableCell className="space-x-2 text-right">
+                              <Button variant="outline" size="sm" onClick={() => openEdit(s)}>
+                                <Pencil className="h-4 w-4" />
+                              </Button>
+
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => onDisable(s.id)}
+                                disabled={!s.active}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </div>
+              </>
+            )}
           </CardContent>
         </Card>
       </div>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="sm:max-w-xl">
+        <DialogContent className="max-h-[90vh] max-w-[95vw] overflow-y-auto sm:max-w-xl">
           <DialogHeader>
             <DialogTitle>
               {editing ? 'Editar vendedor' : 'Nuevo vendedor'}
@@ -259,6 +348,7 @@ export default function SellersPage() {
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
               />
             </div>
+
             <div className="space-y-2">
               <Label>Apellido *</Label>
               <Input
@@ -323,13 +413,14 @@ export default function SellersPage() {
               />
             </div>
 
-            <div className="flex items-center justify-between sm:col-span-2 rounded-md border p-3">
+            <div className="flex items-center justify-between rounded-md border p-3 sm:col-span-2">
               <div>
                 <p className="text-sm font-medium">Activo</p>
                 <p className="text-xs text-muted-foreground">
                   Si lo desactivás, no se puede asignar a nuevos presupuestos
                 </p>
               </div>
+
               <Switch
                 checked={form.active}
                 onCheckedChange={(v) => setForm({ ...form, active: v })}
@@ -337,11 +428,20 @@ export default function SellersPage() {
             </div>
           </div>
 
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setOpen(false)}>
+          <DialogFooter className="flex-col gap-2 sm:flex-row">
+            <Button
+              variant="outline"
+              onClick={() => setOpen(false)}
+              className="w-full sm:w-auto"
+            >
               Cancelar
             </Button>
-            <Button onClick={onSave} disabled={saving || !form.name.trim() || !form.lastName.trim()}>
+
+            <Button
+              onClick={onSave}
+              disabled={saving || !form.name.trim() || !form.lastName.trim()}
+              className="w-full sm:w-auto"
+            >
               {saving ? 'Guardando...' : 'Guardar'}
             </Button>
           </DialogFooter>

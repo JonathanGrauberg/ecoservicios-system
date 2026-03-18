@@ -23,7 +23,7 @@ import {
 } from '@/components/ui/dialog'
 import { Switch } from '@/components/ui/switch'
 import { Badge } from '@/components/ui/badge'
-import { Pencil, Plus, Trash2 } from 'lucide-react'
+import { Pencil, Plus, Trash2, Mail, Phone, MapPin, Wrench } from 'lucide-react'
 
 type Installer = {
   id: string
@@ -144,16 +144,17 @@ export default function InstallersPage() {
         title="Instaladores"
         description={`Activos: ${activeCount}`}
       >
-        <Button onClick={openCreate}>
+        <Button onClick={openCreate} className="w-full sm:w-auto">
           <Plus className="mr-2 h-4 w-4" />
           Nuevo instalador
         </Button>
       </PageHeader>
 
-      <div className="p-8 space-y-6">
+      <div className="space-y-6 p-4 md:p-6 lg:p-8">
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
+          <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <CardTitle>Listado</CardTitle>
+
             <div className="flex items-center gap-2 text-sm">
               <span className="text-muted-foreground">Ver inactivos</span>
               <Switch
@@ -164,63 +165,149 @@ export default function InstallersPage() {
           </CardHeader>
 
           <CardContent className="p-0">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Nombre</TableHead>
-                  <TableHead>Ciudad</TableHead>
-                  <TableHead>Contacto</TableHead>
-                  <TableHead className="text-center">Estado</TableHead>
-                  <TableHead className="text-right">Acciones</TableHead>
-                </TableRow>
-              </TableHeader>
+            {loading ? (
+              <div className="py-10 text-center text-muted-foreground">
+                Cargando...
+              </div>
+            ) : installers.length === 0 ? (
+              <div className="py-10 text-center text-muted-foreground">
+                No hay instaladores
+              </div>
+            ) : (
+              <>
+                {/* MOBILE: cards */}
+                <div className="space-y-4 p-4 md:hidden">
+                  {installers.map((i) => (
+                    <Card key={i.id} className={!i.active ? 'opacity-60' : ''}>
+                      <CardContent className="space-y-4 p-4">
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <p className="font-medium text-card-foreground">
+                              {i.name} {i.lastName}
+                            </p>
 
-              <TableBody>
-                {loading ? (
-                  <TableRow>
-                    <TableCell colSpan={5} className="py-10 text-center text-muted-foreground">
-                      Cargando...
-                    </TableCell>
-                  </TableRow>
-                ) : installers.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={5} className="py-10 text-center text-muted-foreground">
-                      No hay instaladores
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  installers.map((i) => (
-                    <TableRow key={i.id} className={!i.active ? 'opacity-60' : ''}>
-                      <TableCell className="font-medium">
-                        {i.name} {i.lastName}
-                      </TableCell>
-                      <TableCell>{i.city || '—'}</TableCell>
-                      <TableCell className="text-sm text-muted-foreground">
-                        {i.email || i.phone || '—'}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <Badge className={i.active ? 'bg-green-100 text-green-800' : 'bg-muted text-muted-foreground'}>
-                          {i.active ? 'Activo' : 'Inactivo'}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right space-x-2">
-                        <Button variant="outline" size="sm" onClick={() => openEdit(i)}>
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => onDisable(i.id)}
-                          disabled={!i.active}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
+                            <div className="mt-1 flex items-center gap-2 text-sm text-muted-foreground">
+                              <Wrench className="h-4 w-4 shrink-0" />
+                              <span>Instalador</span>
+                            </div>
+                          </div>
+
+                          <Badge
+                            className={
+                              i.active
+                                ? 'bg-green-100 text-green-800'
+                                : 'bg-muted text-muted-foreground'
+                            }
+                          >
+                            {i.active ? 'Activo' : 'Inactivo'}
+                          </Badge>
+                        </div>
+
+                        <div className="space-y-2 text-sm">
+                          <div className="flex items-center gap-2 text-muted-foreground">
+                            <Phone className="h-4 w-4 shrink-0" />
+                            <span>{i.phone || 'Sin teléfono'}</span>
+                          </div>
+
+                          <div className="flex items-center gap-2 text-muted-foreground">
+                            <Mail className="h-4 w-4 shrink-0" />
+                            <span className="break-all">{i.email || 'Sin email'}</span>
+                          </div>
+
+                          {i.city && (
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                              <MapPin className="h-4 w-4 shrink-0" />
+                              <span>{i.city}</span>
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="flex gap-2">
+                          <Button
+                            variant="outline"
+                            className="flex-1"
+                            onClick={() => openEdit(i)}
+                          >
+                            <Pencil className="mr-2 h-4 w-4" />
+                            Editar
+                          </Button>
+
+                          <Button
+                            variant="outline"
+                            className="flex-1"
+                            onClick={() => onDisable(i.id)}
+                            disabled={!i.active}
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Desactivar
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+
+                {/* DESKTOP/TABLET: table */}
+                <div className="hidden md:block">
+                  <div className="w-full overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Nombre</TableHead>
+                          <TableHead>Ciudad</TableHead>
+                          <TableHead>Contacto</TableHead>
+                          <TableHead className="text-center">Estado</TableHead>
+                          <TableHead className="text-right">Acciones</TableHead>
+                        </TableRow>
+                      </TableHeader>
+
+                      <TableBody>
+                        {installers.map((i) => (
+                          <TableRow key={i.id} className={!i.active ? 'opacity-60' : ''}>
+                            <TableCell className="font-medium">
+                              {i.name} {i.lastName}
+                            </TableCell>
+
+                            <TableCell>{i.city || '—'}</TableCell>
+
+                            <TableCell className="text-sm text-muted-foreground">
+                              {i.email || i.phone || '—'}
+                            </TableCell>
+
+                            <TableCell className="text-center">
+                              <Badge
+                                className={
+                                  i.active
+                                    ? 'bg-green-100 text-green-800'
+                                    : 'bg-muted text-muted-foreground'
+                                }
+                              >
+                                {i.active ? 'Activo' : 'Inactivo'}
+                              </Badge>
+                            </TableCell>
+
+                            <TableCell className="space-x-2 text-right">
+                              <Button variant="outline" size="sm" onClick={() => openEdit(i)}>
+                                <Pencil className="h-4 w-4" />
+                              </Button>
+
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => onDisable(i.id)}
+                                disabled={!i.active}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </div>
+              </>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -274,13 +361,14 @@ export default function InstallersPage() {
               />
             </div>
 
-            <div className="flex items-center justify-between sm:col-span-2 rounded-md border p-3">
+            <div className="flex items-center justify-between rounded-md border p-3 sm:col-span-2">
               <div>
                 <p className="text-sm font-medium">Activo</p>
                 <p className="text-xs text-muted-foreground">
                   Si lo desactivás, no se puede asignar a nuevos presupuestos
                 </p>
               </div>
+
               <Switch
                 checked={form.active}
                 onCheckedChange={(v) => setForm({ ...form, active: v })}
@@ -288,10 +376,11 @@ export default function InstallersPage() {
             </div>
           </div>
 
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setOpen(false)}>
+          <DialogFooter className="flex-col gap-2 sm:flex-row">
+            <Button variant="outline" onClick={() => setOpen(false)} className="w-full sm:w-auto">
               Cancelar
             </Button>
+
             <Button
               onClick={onSave}
               disabled={
@@ -300,6 +389,7 @@ export default function InstallersPage() {
                 !form.lastName.trim() ||
                 !form.phone.trim()
               }
+              className="w-full sm:w-auto"
             >
               {saving ? 'Guardando...' : 'Guardar'}
             </Button>

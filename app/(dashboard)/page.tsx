@@ -96,7 +96,7 @@ export default function DashboardPage() {
 
       <div className="p-8">
         {/* Stats Grid */}
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
           <StatCard
             title="Clientes"
             value={stats?.totalClients ?? 0}
@@ -126,12 +126,6 @@ export default function DashboardPage() {
             value={stats?.pendingBudgets ?? 0}
             icon={Clock}
             description="En gestión"
-          />
-          <StatCard
-            title="Ingresos"
-            value={formatCurrency(stats?.totalRevenue ?? 0)}
-            icon={DollarSign}
-            description="Aprobados"
           />
         </div>
 
