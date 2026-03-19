@@ -32,14 +32,10 @@ export async function GET(
        Cargar logos desde /public
        ======================== */
 
-    const logoPath = path.join(process.cwd(), "public", "logo-ecoservicios.png")
-    const watermarkPath = path.join(process.cwd(), "public", "logo-watermark.png")
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://ecoservicios-system.vercel.app"
 
-    const logoBuffer = await fs.readFile(logoPath)
-    const watermarkBuffer = await fs.readFile(watermarkPath)
-
-    const logoDataUri = `data:image/png;base64,${logoBuffer.toString("base64")}`
-    const watermarkDataUri = `data:image/png;base64,${watermarkBuffer.toString("base64")}`
+    const logoDataUri = `${baseUrl}/logo-ecoservicios.png`
+    const watermarkDataUri = `${baseUrl}/logo-watermark.png`
 
     /* ========================
        Generar HTML
