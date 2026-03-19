@@ -17,8 +17,6 @@ enum ProductCategory {
   grease_traps
   maintenance
   other
-
-  @@schema("public")
 }
 
 enum BudgetStatus {
@@ -27,11 +25,7 @@ enum BudgetStatus {
   approved
   rejected
   expired
-
-  @@schema("public")
 }
-
-/* 👉 NUEVOS ENUMS */
 
 enum ClientType {
   home
@@ -39,8 +33,12 @@ enum ClientType {
   hall
   sanitary
   company
+}
 
-  @@schema("public")
+enum StockMovementType {
+  in
+  out
+  adjust
 }
 
 /* =========================
@@ -61,23 +59,21 @@ model Client {
   email     String
   phone     String
 
-  // Dirección (se mantiene)
+  // Dirección
   address   String
 
-  // Ubicación geográfica (campo / rural)
+  // Ubicación
   latitude  Float?
   longitude Float?
 
-  // Uso del sistema
+  // Uso
   type            ClientType?
   peopleCount     Int?
   usageFrequency  String?
 
-  // ✅ Seguimiento comercial (status como STRING)
+  // Comercial
   status    String   @default("nuevo")
   notes     String   @default("")
-
-  // ✅ Campos comerciales nuevos
   lastContactAt   DateTime?
   assignedSeller  String?
   locationUrl     String?
@@ -87,8 +83,6 @@ model Client {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  @@schema("public")
 }
 
 model ProductService {
@@ -103,12 +97,10 @@ model ProductService {
   stock       Int              @default(0)
 
   items          BudgetItem[]
-  stockMovements StockMovement[]  // ✅ NUEVO
+  stockMovements StockMovement[]
 
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
-
-  @@schema("public")
 }
 
 model Budget {
@@ -116,21 +108,22 @@ model Budget {
 
   clientId String
   client   Client        @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
   items    BudgetItem[]
+  history  BudgetStatusHistory[]
 
   status   BudgetStatus  @default(draft)
   notes    String        @default("")
-  history  BudgetStatusHistory[]
 
-  // Vendedores
+  // Vendedor
   sellerId String?
   seller   Seller? @relation(fields: [sellerId], references: [id], onDelete: SetNull)
 
-  // Instaladores
+  // Instalador
   installerId String?
   installer   Installer? @relation(fields: [installerId], references: [id], onDelete: SetNull)
 
-  // Datos de instalación
+  // Instalación
   installationResponsible String?
   installerReference      String?
   siteDetails             String?
@@ -149,8 +142,6 @@ model Budget {
 
   createdAt DateTime     @default(now())
   updatedAt DateTime     @updatedAt
-
-  @@schema("public")
 }
 
 model Installer {
@@ -168,8 +159,28 @@ model Installer {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
 
-  @@schema("public")
+model Seller {
+  id        String   @id @default(uuid())
+
+  name      String
+  lastName  String
+  dni       String?
+  email     String?
+  phone     String?
+
+  address   String?
+  city      String?
+  province  String?
+  sector    String?
+
+  budgets Budget[]
+
+  active    Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model BudgetItem {
@@ -185,8 +196,6 @@ model BudgetItem {
   unitPrice        Float
   discount         Float           @default(0)
   subtotal         Float?
-
-  @@schema("public")
 }
 
 model BudgetStatusHistory {
@@ -199,33 +208,6 @@ model BudgetStatusHistory {
   to        BudgetStatus
   changedAt DateTime @default(now())
   user      String?
-
-  @@schema("public")
-}
-
-model Seller {
-  id        String   @id @default(uuid())
-
-  name      String
-  lastName  String
-  dni       String?
-  email     String?
-  phone     String?
-
-  address   String?
-  city      String?
-  province  String?
-
-  sector    String?
-
-  budgets Budget[]
-
-  active    Boolean  @default(true)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@schema("public")
 }
 
 model StockMovement {
@@ -239,16 +221,4 @@ model StockMovement {
   reason String?
 
   createdAt DateTime @default(now())
-
-  @@schema("public") // ✅ IMPORTANTE
 }
-
-enum StockMovementType {
-  in
-  out
-  adjust
-
-  @@schema("public") // ✅ IMPORTANTE
-}
-
-
