@@ -2,9 +2,11 @@ import puppeteer from "puppeteer-core"
 import chromium from "@sparticuz/chromium"
 
 export async function generatePdf(html: string): Promise<Uint8Array> {
+  const executablePath = await chromium.executablePath()
+
   const browser = await puppeteer.launch({
     args: chromium.args,
-    executablePath: await chromium.executablePath(),
+    executablePath,
     headless: true,
   })
 
