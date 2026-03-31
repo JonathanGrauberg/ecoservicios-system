@@ -2,10 +2,14 @@ import puppeteer from "puppeteer-core"
 import chromium from "@sparticuz/chromium-min"
 
 export async function generatePdf(html: string): Promise<Uint8Array> {
-  const executablePath = await chromium.executablePath()
+  const isDev = process.env.NODE_ENV !== "production"
+
+  const executablePath = isDev
+    ? "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+    : await chromium.executablePath()
 
   const browser = await puppeteer.launch({
-    args: chromium.args,
+    args: isDev ? [] : chromium.args,
     executablePath,
     headless: true,
   })
