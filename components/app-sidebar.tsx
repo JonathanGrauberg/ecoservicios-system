@@ -131,7 +131,7 @@ function SidebarContent({ closeMenu }: { closeMenu?: () => void }) {
 
       <div className="border-t border-sidebar-border p-4">
         <p className="text-xs text-sidebar-foreground/50">
-          v1.0.0 - Prototipo
+          v1.0.0 - Creado por Webi.
         </p>
       </div>
     </div>

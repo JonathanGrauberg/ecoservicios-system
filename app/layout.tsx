@@ -10,7 +10,7 @@ const _geistMono = Geist_Mono({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: 'Ecoservicios - Sistema de Gestión',
   description: 'Sistema interno de gestión para Ecoservicios - Biodigestores, Trampas de Grasa, Mantenimiento',
-  generator: 'v0.app',
+  generator: 'Webi.',
   icons: {
     icon: [
       {
