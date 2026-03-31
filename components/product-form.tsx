@@ -42,28 +42,28 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
     active: product?.active ?? true,
   })
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault()
+  setIsSubmitting(true)
 
-    try {
-      const url = product ? `/api/products/${product.id}` : '/api/products'
-      const method = product ? 'PUT' : 'POST'
+  try {
+    const url = product ? `/api/products/${product.id}` : '/api/products'
+    const method = product ? 'PATCH' : 'POST' // 👈 FIX
 
-      const res = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      })
+    const res = await fetch(url, {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData),
+    })
 
-      if (!res.ok) throw new Error('Failed to save product')
-      onSuccess()
-    } catch (error) {
-      console.error('Error saving product:', error)
-    } finally {
-      setIsSubmitting(false)
-    }
+    if (!res.ok) throw new Error('Failed to save product')
+    onSuccess()
+  } catch (error) {
+    console.error('Error saving product:', error)
+  } finally {
+    setIsSubmitting(false)
   }
+}
 
   return (
     <TooltipProvider>
