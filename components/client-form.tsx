@@ -191,7 +191,7 @@ export function ClientForm({ client, onSuccess, onCancel }: ClientFormProps) {
 
         {/* Tipo de cliente */}
         <div className="space-y-2">
-          <Label>Tipo de cliente</Label>
+          <Label>Tipo de Uso</Label>
           <Select
             value={formData.type}
             onValueChange={(v) => setFormData({ ...formData, type: v })}
@@ -201,7 +201,8 @@ export function ClientForm({ client, onSuccess, onCancel }: ClientFormProps) {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="home">Casa</SelectItem>
-              <SelectItem value="permanent_use">Uso permanente</SelectItem>
+              <SelectItem value="home">Casa Modular</SelectItem>
+              <SelectItem value="home">Cabaña</SelectItem>
               <SelectItem value="hall">Salón</SelectItem>
               <SelectItem value="sanitary">Sanitario</SelectItem>
               <SelectItem value="company">Empresa</SelectItem>
