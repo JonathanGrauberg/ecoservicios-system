@@ -1,13 +1,18 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
+/* ======================
+   GET
+====================== */
 export async function GET(
   _req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
+
     const product = await prisma.productService.findUnique({
-      where: { id: params.id },
+      where: { id },
     })
 
     if (!product) {
@@ -21,26 +26,30 @@ export async function GET(
   }
 }
 
+/* ======================
+   PATCH
+====================== */
 export async function PATCH(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const data = await req.json()
 
-    // ⚠️ IMPORTANTE:
-    // El stock NO se edita desde productos. Se administra en /stock (módulo aparte).
     const updated = await prisma.productService.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         name: typeof data.name === 'string' ? data.name : undefined,
         description:
           typeof data.description === 'string' ? data.description : undefined,
         category: typeof data.category === 'string' ? data.category : undefined,
-        price: data.price !== undefined ? Number(data.price) : undefined,
+        price:
+          data.price !== undefined && data.price !== ''
+            ? Number(data.price)
+            : undefined,
         unit: typeof data.unit === 'string' ? data.unit : undefined,
         active: typeof data.active === 'boolean' ? data.active : undefined,
-        // ✅ NO stock acá
       },
     })
 
@@ -51,14 +60,18 @@ export async function PATCH(
   }
 }
 
+/* ======================
+   DELETE (soft delete)
+====================== */
 export async function DELETE(
   _req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // ✅ soft delete
+    const { id } = await params
+
     const updated = await prisma.productService.update({
-      where: { id: params.id },
+      where: { id },
       data: { active: false },
     })
 
