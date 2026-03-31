@@ -148,14 +148,14 @@ export function AppSidebar() {
         <div className="sticky top-0 z-40 flex h-14 items-center justify-between border-b border-border bg-background px-4 lg:hidden">
           <div className="flex items-center gap-2">
             <Image
-              src="/e-de-eco.png"
+              src="/logo-watermark.png"
               alt="Ecoservicios"
               width={28}
               height={28}
               className="object-contain"
               priority
             />
-            <span className="text-sm font-semibold">Ecoservicios</span>
+            <span className="text-sm font-semibold">Sistema Ecoservicios</span>
           </div>
 
           <Sheet open={open} onOpenChange={setOpen}>
