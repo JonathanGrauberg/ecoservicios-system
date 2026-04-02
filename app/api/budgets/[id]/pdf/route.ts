@@ -7,6 +7,9 @@ import { generatePdf } from "@/lib/pdf/generator"
 import fs from "fs/promises"
 import path from "path"
 
+export const maxDuration = 60
+
+
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -36,8 +39,17 @@ export async function GET(
 
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://ecoservicios-system.vercel.app"
 
-    const logoDataUri = `${baseUrl}/logo-ecoservicios.png`
-    const watermarkDataUri = `${baseUrl}/logo-watermark.png`
+    const logoBase64 = await fetch(`${baseUrl}/logo-ecoservicios.png`)
+      .then(res => res.arrayBuffer())
+      .then(buf => Buffer.from(buf).toString("base64"))
+
+    const logoDataUri = `data:image/png;base64,${logoBase64}`
+
+    const watermarkBase64 = await fetch(`${baseUrl}/logo-watermark.png`)
+      .then(res => res.arrayBuffer())
+      .then(buf => Buffer.from(buf).toString("base64"))
+
+    const watermarkDataUri = `data:image/png;base64,${watermarkBase64}`
 
     /* ========================
        Generar HTML

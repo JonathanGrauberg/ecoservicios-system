@@ -180,16 +180,35 @@ export default function BudgetDetailPage() {
     }
   }
 
-  const handleGeneratePDF = () => {
-    if (!isValidId) return
+const handleGeneratePDF = async () => {
+  if (!isValidId) return
 
-    setIsGeneratingPDF(true)
-    window.open(`/api/budgets/${id}/pdf`, '_blank')
+  setIsGeneratingPDF(true)
 
-    setTimeout(() => {
-      setIsGeneratingPDF(false)
-    }, 800)
+  try {
+    const res = await fetch(`/api/budgets/${id}/pdf`)
+
+    if (!res.ok) {
+      throw new Error("Error generando PDF")
+    }
+
+    const blob = await res.blob()
+    const url = window.URL.createObjectURL(blob)
+
+    const a = document.createElement("a")
+    a.href = url
+    a.download = `presupuesto-${id.slice(0, 6)}.pdf`
+    document.body.appendChild(a)
+    a.click()
+    a.remove()
+
+    window.URL.revokeObjectURL(url)
+  } catch (err) {
+    console.error("Error descargando PDF:", err)
+  } finally {
+    setIsGeneratingPDF(false)
   }
+}
 
   if (!isValidId) {
     return (

@@ -1,5 +1,5 @@
 import puppeteer from "puppeteer-core"
-import chromium from "@sparticuz/chromium-min"
+import chromium from "@sparticuz/chromium"
 
 export async function generatePdf(html: string): Promise<Uint8Array> {
   const isDev = process.env.NODE_ENV !== "production"
