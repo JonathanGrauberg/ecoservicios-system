@@ -9,15 +9,21 @@ export async function generatePdf(html: string): Promise<Uint8Array> {
     : await chromium.executablePath()
 
   const browser = await puppeteer.launch({
-    args: isDev ? [] : chromium.args,
+    args: isDev
+      ? []
+      : [
+          ...chromium.args,
+          "--no-sandbox",
+          "--disable-setuid-sandbox",
+        ],
     executablePath,
-    headless: true,
+    headless: true, // 👈 simple y compatible
   })
 
   const page = await browser.newPage()
 
   await page.setContent(html, {
-  waitUntil: "domcontentloaded",
+    waitUntil: "domcontentloaded", // 👈 clave para Vercel
   })
 
   const pdf = await page.pdf({

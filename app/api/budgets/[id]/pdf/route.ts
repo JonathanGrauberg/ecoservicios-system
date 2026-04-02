@@ -1,4 +1,5 @@
 export const runtime = "nodejs"
+export const maxDuration = 60
 
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
@@ -6,9 +7,6 @@ import { budgetPdfTemplate } from "@/lib/pdf/template"
 import { generatePdf } from "@/lib/pdf/generator"
 import fs from "fs/promises"
 import path from "path"
-
-export const maxDuration = 60
-
 
 export async function GET(
   request: Request,
@@ -23,10 +21,10 @@ export async function GET(
         client: true,
         items: {
           include: {
-            productService: true
-          }
-        }
-      }
+            productService: true,
+          },
+        },
+      },
     })
 
     if (!budget) {
@@ -34,21 +32,24 @@ export async function GET(
     }
 
     /* ========================
-       Cargar logos desde /public
+       Cargar logos desde /public (SIN fetch)
        ======================== */
 
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://ecoservicios-system.vercel.app"
+    const logoPath = path.join(
+      process.cwd(),
+      "public",
+      "logo-ecoservicios.png"
+    )
+    const watermarkPath = path.join(
+      process.cwd(),
+      "public",
+      "logo-watermark.png"
+    )
 
-    const logoBase64 = await fetch(`${baseUrl}/logo-ecoservicios.png`)
-      .then(res => res.arrayBuffer())
-      .then(buf => Buffer.from(buf).toString("base64"))
+    const logoBase64 = (await fs.readFile(logoPath)).toString("base64")
+    const watermarkBase64 = (await fs.readFile(watermarkPath)).toString("base64")
 
     const logoDataUri = `data:image/png;base64,${logoBase64}`
-
-    const watermarkBase64 = await fetch(`${baseUrl}/logo-watermark.png`)
-      .then(res => res.arrayBuffer())
-      .then(buf => Buffer.from(buf).toString("base64"))
-
     const watermarkDataUri = `data:image/png;base64,${watermarkBase64}`
 
     /* ========================
@@ -57,7 +58,7 @@ export async function GET(
 
     const html = budgetPdfTemplate(budget, {
       logoDataUri,
-      watermarkDataUri
+      watermarkDataUri,
     })
 
     const pdfUint8 = await generatePdf(html)
@@ -66,15 +67,14 @@ export async function GET(
     return new NextResponse(buffer, {
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": `attachment; filename=presupuesto-${id.slice(0, 6)}.pdf`
-      }
+        "Content-Disposition": `attachment; filename=presupuesto-${id.slice(0, 6)}.pdf`,
+      },
     })
-
   } catch (error) {
-    console.error("PDF error:", error)
+    console.error("PDF error FULL:", error)
 
     return NextResponse.json(
-      { error: "PDF generation failed" },
+      { error: String(error) },
       { status: 500 }
     )
   }
