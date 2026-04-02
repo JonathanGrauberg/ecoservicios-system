@@ -1,9 +1,9 @@
 import puppeteer from "puppeteer-core"
 import chromium from "@sparticuz/chromium-min"
 
-// 👇 IMPORTANTE: versión alineada con tu chromium
+// 👇 versión válida confirmada
 const CHROMIUM_REMOTE_URL =
-  "https://github.com/Sparticuz/chromium/releases/latest/download/chromium-pack.tar"
+  "https://github.com/Sparticuz/chromium/releases/download/v119.0.0/chromium-v119.0.0-pack.tar"
 
 export async function generatePdf(html: string): Promise<Uint8Array> {
   const isDev = process.env.NODE_ENV !== "production"
@@ -22,13 +22,13 @@ export async function generatePdf(html: string): Promise<Uint8Array> {
           "--disable-dev-shm-usage",
         ],
     executablePath,
-    headless: true, // 👈 evitamos problemas de types
+    headless: true, // 👈 fijo, sin depender de chromium
   })
 
   const page = await browser.newPage()
 
   await page.setContent(html, {
-    waitUntil: "domcontentloaded",
+    waitUntil: "domcontentloaded", // 👈 clave
   })
 
   const pdf = await page.pdf({
