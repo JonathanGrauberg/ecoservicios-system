@@ -3,7 +3,7 @@ import chromium from "@sparticuz/chromium-min"
 
 // 👇 IMPORTANTE: versión alineada con tu chromium
 const CHROMIUM_REMOTE_URL =
-  "https://github.com/Sparticuz/chromium/releases/download/v143.0.0/chromium-v143.0.0-pack.tar"
+  "https://github.com/Sparticuz/chromium/releases/latest/download/chromium-pack.tar"
 
 export async function generatePdf(html: string): Promise<Uint8Array> {
   const isDev = process.env.NODE_ENV !== "production"
