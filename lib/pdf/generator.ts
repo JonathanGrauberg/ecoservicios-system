@@ -1,9 +1,8 @@
 import puppeteer from "puppeteer-core"
 import chromium from "@sparticuz/chromium-min"
 
-// 👇 versión válida confirmada
 const CHROMIUM_REMOTE_URL =
-  "https://github.com/Sparticuz/chromium/releases/download/v119.0.0/chromium-v119.0.0-pack.tar"
+  "https://github.com/Sparticuz/chromium/releases/download/v143.0.4/chromium-v143.0.4-pack.x64.tar"
 
 export async function generatePdf(html: string): Promise<Uint8Array> {
   const isDev = process.env.NODE_ENV !== "production"
@@ -13,22 +12,23 @@ export async function generatePdf(html: string): Promise<Uint8Array> {
     : await chromium.executablePath(CHROMIUM_REMOTE_URL)
 
   const browser = await puppeteer.launch({
-    args: isDev
-      ? []
-      : [
-          ...chromium.args,
-          "--no-sandbox",
-          "--disable-setuid-sandbox",
-          "--disable-dev-shm-usage",
-        ],
+    args: chromium.args,
     executablePath,
-    headless: true, // 👈 fijo, sin depender de chromium
+    headless: "shell", // ✅ valor correcto para Puppeteer en v137+
+    defaultViewport: {
+      deviceScaleFactor: 1,
+      hasTouch: false,
+      height: 1080,
+      isLandscape: true,
+      isMobile: false,
+      width: 1920,
+    },
   })
 
   const page = await browser.newPage()
 
   await page.setContent(html, {
-    waitUntil: "domcontentloaded", // 👈 clave
+    waitUntil: "domcontentloaded",
   })
 
   const pdf = await page.pdf({
