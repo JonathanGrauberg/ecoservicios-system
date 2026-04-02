@@ -201,8 +201,8 @@ export function ClientForm({ client, onSuccess, onCancel }: ClientFormProps) {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="home">Casa</SelectItem>
-              <SelectItem value="home">Casa Modular</SelectItem>
-              <SelectItem value="home">Cabaña</SelectItem>
+              <SelectItem value="home_modular">Casa Modular</SelectItem>
+              <SelectItem value="cabin">Cabaña</SelectItem>
               <SelectItem value="hall">Salón</SelectItem>
               <SelectItem value="sanitary">Sanitario</SelectItem>
               <SelectItem value="company">Empresa</SelectItem>
