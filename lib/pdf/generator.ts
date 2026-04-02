@@ -17,7 +17,7 @@ export async function generatePdf(html: string): Promise<Uint8Array> {
   const page = await browser.newPage()
 
   await page.setContent(html, {
-    waitUntil: "networkidle0",
+  waitUntil: "domcontentloaded",
   })
 
   const pdf = await page.pdf({
