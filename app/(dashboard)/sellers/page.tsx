@@ -127,13 +127,18 @@ export default function SellersPage() {
         body: JSON.stringify(payload),
       })
 
-      if (!res.ok) throw new Error('Failed to save seller')
+      const data = await res.json().catch(() => null)
+
+      if (!res.ok) {
+        console.error("ERROR BACKEND:", data)
+        throw new Error(data?.error || 'Failed to save seller')
+      }
 
       setOpen(false)
       await fetchSellers()
-    } catch (e) {
-      console.error(e)
-      alert('No se pudo guardar el vendedor')
+    } catch (error: any) {
+      console.error('Update seller error FRONT:', error)
+      alert(error?.message || 'Error al guardar vendedor')
     } finally {
       setSaving(false)
     }

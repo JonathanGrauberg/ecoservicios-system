@@ -1,11 +1,17 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
-type Params = { params: { id: string } }
-
-export async function PATCH(request: Request, { params }: Params) {
+export async function PATCH(
+  request: Request,
+  context: { params: Promise<{ id: string }> }
+) {
   try {
-    const id = params.id
+    const { id } = await context.params // ✅ ESTE ES EL FIX REAL
+
+    if (!id) {
+      return NextResponse.json({ error: 'Missing ID' }, { status: 400 })
+    }
+
     const data = await request.json()
 
     const seller = await prisma.seller.update({
@@ -25,25 +31,44 @@ export async function PATCH(request: Request, { params }: Params) {
     })
 
     return NextResponse.json(seller)
-  } catch (error) {
-    console.error('Update seller error:', error)
-    return NextResponse.json({ error: String(error) }, { status: 500 })
+  } catch (error: any) {
+    console.error('Update seller error FULL:', error)
+
+    return NextResponse.json(
+      {
+        error: error?.message || 'Unknown error',
+        code: error?.code || null,
+        meta: error?.meta || null,
+      },
+      { status: 500 }
+    )
   }
 }
 
-// Soft delete: active=false
-export async function DELETE(_: Request, { params }: Params) {
+// ✅ DELETE corregido también
+export async function DELETE(
+  _: Request,
+  context: { params: Promise<{ id: string }> }
+) {
   try {
-    const id = params.id
+    const { id } = await context.params // ✅ FIX
 
-    const seller = await prisma.seller.update({
+    if (!id) {
+      return NextResponse.json({ error: 'Missing ID' }, { status: 400 })
+    }
+
+    await prisma.seller.update({
       where: { id },
       data: { active: false },
     })
 
-    return NextResponse.json(seller)
-  } catch (error) {
-    console.error('Disable seller error:', error)
-    return NextResponse.json({ error: String(error) }, { status: 500 })
+    return NextResponse.json({ ok: true })
+  } catch (error: any) {
+    console.error('Disable seller error FULL:', error)
+
+    return NextResponse.json(
+      { error: error?.message || 'Unknown error' },
+      { status: 500 }
+    )
   }
 }
