@@ -108,27 +108,27 @@ export function ClientForm({ client, onSuccess, onCancel }: ClientFormProps) {
           </div>
 
           <div className="space-y-2">
-            <Label>Empresa *</Label>
+            <Label>Empresa</Label>
             <Input
               value={formData.company}
               onChange={(e) =>
                 setFormData({ ...formData, company: e.target.value })
               }
-              required
+              
             />
           </div>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
-            <Label>Email *</Label>
+            <Label>Email</Label>
             <Input
               type="email"
               value={formData.email}
               onChange={(e) =>
                 setFormData({ ...formData, email: e.target.value })
               }
-              required
+              
             />
           </div>
 

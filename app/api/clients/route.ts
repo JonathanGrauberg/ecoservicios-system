@@ -20,30 +20,28 @@ export async function POST(request: Request) {
   try {
     const data = await request.json()
 
+    // Sanitización de campos básicos
     const name = typeof data?.name === 'string' ? data.name.trim() : ''
-    const company = typeof data?.company === 'string' && data.company.trim() ? data.company.trim() : null
-    const email = typeof data?.email === 'string' ? data.email.trim() : ''
     const phone = typeof data?.phone === 'string' ? data.phone.trim() : ''
+    
+    // Si están vacíos, que sean NULL (importante para el email si es unique)
+    const company = typeof data?.company === 'string' && data.company.trim() ? data.company.trim() : null
+    const email = typeof data?.email === 'string' && data.email.trim() ? data.email.trim() : null
 
-    if (!name || !email || !phone) {
+    if (!name || !phone) {
       return NextResponse.json(
-        { error: 'Missing required fields', missing: ['name', 'email', 'phone'] },
+        { error: 'Missing required fields', missing: ['name', 'phone'] },
         { status: 400 }
       )
     }
 
-    const allowedClientType = new Set(['home', 'permanent_use', 'hall', 'sanitary', 'company'])
+    // Sincronizado con las opciones de tu formulario frontend
+    const allowedClientType = new Set(['home', 'home_modular', 'cabin', 'hall', 'sanitary', 'company'])
     const type = allowedClientType.has(data?.type) ? data.type : null
 
     const allowedCommercialStatus = new Set([
-      'nuevo',
-      'contactado',
-      'presupuesto_enviado',
-      'interesado',
-      'sin_respuesta',
-      'rechazado',
-      'cliente_activo',
-      'cliente_frecuente',
+      'nuevo', 'contactado', 'presupuesto_enviado', 'interesado', 
+      'sin_respuesta', 'rechazado', 'cliente_activo', 'cliente_frecuente',
     ])
     const status = allowedCommercialStatus.has(data?.status) ? data.status : 'nuevo'
 
@@ -54,28 +52,20 @@ export async function POST(request: Request) {
         company,
         dni: data?.dni ? String(data.dni).trim() : null,
         cuit: data?.cuit ? String(data.cuit).trim() : null,
-
         email,
         phone,
-
-        address:
-          typeof data?.address === 'string' && data.address.trim()
-            ? data.address.trim()
-            : '—',
-
-        latitude: typeof data?.latitude === 'number' ? data.latitude : null,
-        longitude: typeof data?.longitude === 'number' ? data.longitude : null,
-
+        address: typeof data?.address === 'string' && data.address.trim() ? data.address.trim() : '—',
         type,
         peopleCount: data?.peopleCount ? Number(data.peopleCount) || null : null,
         usageFrequency: data?.usageFrequency ? String(data.usageFrequency) : null,
-
         status,
         notes: typeof data?.notes === 'string' ? data.notes : '',
-
         locationUrl: data?.locationUrl ? String(data.locationUrl).trim() : null,
         assignedSeller: data?.assignedSeller ? String(data.assignedSeller).trim() : null,
-        lastContactAt: data?.lastContactAt ? new Date(data.lastContactAt) : null,
+        // Evita el error 'Invalid Date' si el string viene vacío
+        lastContactAt: data?.lastContactAt && String(data.lastContactAt).trim() !== '' 
+          ? new Date(data.lastContactAt) 
+          : null,
       },
     })
 
