@@ -56,7 +56,7 @@ model Client {
   cuit      String?
 
   // Contacto
-  email     String
+  email     String?
   phone     String
 
   // Dirección
