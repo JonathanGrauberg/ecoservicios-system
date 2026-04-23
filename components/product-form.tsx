@@ -37,7 +37,7 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
     name: product?.name || '',
     description: product?.description || '',
     category: product?.category || 'other' as ProductCategory,
-    price: product?.price || 0,
+    price: product?.price || '',
     unit: product?.unit || 'unidad',
     active: product?.active ?? true,
   })
@@ -157,7 +157,7 @@ const handleSubmit = async (e: React.FormEvent) => {
 
         <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <Label htmlFor="price">Precio (CRC) *</Label>
+            <Label htmlFor="price">Precio (ARS) *</Label>
             <Tooltip>
               <TooltipTrigger asChild>
                 <HelpCircle className="h-3.5 w-3.5 text-muted-foreground" />
@@ -169,9 +169,11 @@ const handleSubmit = async (e: React.FormEvent) => {
             id="price"
             type="number"
             min="0"
-            step="1000"
+            step="any"
             value={formData.price}
-            onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
+            onChange={(e) =>
+              setFormData({ ...formData, price: e.target.value })
+            }
             placeholder="850000"
             required
           />
