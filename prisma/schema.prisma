@@ -28,7 +28,8 @@ enum BudgetStatus {
 
 enum ClientType {
   home
-  permanent_use
+  home_modular
+  cabin
   hall
   sanitary
   company
