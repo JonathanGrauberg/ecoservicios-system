@@ -32,19 +32,11 @@ export async function GET(
     }
 
     /* ========================
-       Cargar logos desde /public (SIN fetch)
+       Cargar logos desde /public
        ======================== */
 
-    const logoPath = path.join(
-      process.cwd(),
-      "public",
-      "logo-ecoservicios.png"
-    )
-    const watermarkPath = path.join(
-      process.cwd(),
-      "public",
-      "logo-watermark.png"
-    )
+    const logoPath = path.join(process.cwd(), "public", "logo-ecoservicios.png")
+    const watermarkPath = path.join(process.cwd(), "public", "logo-watermark.png")
 
     const logoBase64 = (await fs.readFile(logoPath)).toString("base64")
     const watermarkBase64 = (await fs.readFile(watermarkPath)).toString("base64")
@@ -64,10 +56,35 @@ export async function GET(
     const pdfUint8 = await generatePdf(html)
     const buffer = Buffer.from(pdfUint8)
 
+    /* ========================
+       Nombre del archivo PDF
+       ======================== */
+
+    const clientName = budget.client?.name || ""
+    const clientLastName = budget.client?.lastName || ""
+
+    const safeName = `${clientName} ${clientLastName}`
+      .trim()
+      .replace(/\s+/g, "_")     // espacios → _
+      .replace(/[^\w\-]/g, "")  // limpia caracteres raros
+      .toLowerCase() || "cliente"
+
+    const fileName = `${safeName}_pto_${id.slice(0, 6)}.pdf`
+
+    console.log("PDF filename:", fileName)
+
     return new NextResponse(buffer, {
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": `attachment; filename=presupuesto-${id.slice(0, 6)}.pdf`,
+
+        // 👇 nombre correcto (BIEN FORMADO)
+        "Content-Disposition": `attachment; filename="${fileName}"`,
+
+        // 🚫 ANTI CACHE TOTAL
+        "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+        "Pragma": "no-cache",
+        "Expires": "0",
+        "Surrogate-Control": "no-store",
       },
     })
   } catch (error) {

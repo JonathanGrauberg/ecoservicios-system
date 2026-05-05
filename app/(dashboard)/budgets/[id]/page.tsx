@@ -195,9 +195,21 @@ const handleGeneratePDF = async () => {
     const blob = await res.blob()
     const url = window.URL.createObjectURL(blob)
 
+    // 👇 Obtener nombre real desde headers
+    const contentDisposition = res.headers.get("Content-Disposition")
+
+    let fileName = "presupuesto.pdf"
+
+    if (contentDisposition) {
+      const match = contentDisposition.match(/filename="?([^"]+)"?/)
+      if (match?.[1]) {
+        fileName = match[1]
+      }
+    }
+
     const a = document.createElement("a")
     a.href = url
-    a.download = `presupuesto-${id.slice(0, 6)}.pdf`
+    a.download = fileName
     document.body.appendChild(a)
     a.click()
     a.remove()
@@ -209,7 +221,6 @@ const handleGeneratePDF = async () => {
     setIsGeneratingPDF(false)
   }
 }
-
   if (!isValidId) {
     return (
       <div className="flex min-h-screen items-center justify-center">
