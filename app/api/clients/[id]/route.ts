@@ -42,6 +42,8 @@ export async function PUT(
         email: data.email?.trim() || null,
         phone: data.phone?.trim(),
         address: data.address?.trim() || '—',
+        city: typeof data?.city === 'string' && data.city.trim() ? data.city.trim() : null,
+        province: typeof data?.province === 'string' && data.province.trim() ? data.province.trim() : null,
         type: data.type || null,
         peopleCount: data.peopleCount ? Number(data.peopleCount) : null,
         usageFrequency: data.usageFrequency || null,

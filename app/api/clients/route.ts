@@ -55,6 +55,8 @@ export async function POST(request: Request) {
         email,
         phone,
         address: typeof data?.address === 'string' && data.address.trim() ? data.address.trim() : '—',
+        city: typeof data?.city === 'string' && data.city.trim() ? data.city.trim() : null,
+        province: typeof data?.province === 'string' && data.province.trim() ? data.province.trim() : null,
         type,
         peopleCount: data?.peopleCount ? Number(data.peopleCount) || null : null,
         usageFrequency: data?.usageFrequency ? String(data.usageFrequency) : null,

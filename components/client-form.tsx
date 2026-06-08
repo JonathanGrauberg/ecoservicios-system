@@ -66,13 +66,40 @@ export function ClientForm({ client, onSuccess, onCancel }: ClientFormProps) {
       const url = client ? `/api/clients/${client.id}` : '/api/clients'
       const method = client ? 'PUT' : 'POST'
 
+      const payload: any = {
+        name: formData.name,
+        company: formData.company || null,
+        dni: formData.dni || null,
+        cuit: formData.cuit || null,
+        email: formData.email || null,
+        phone: formData.phone,
+        address: formData.address || '',
+        city: formData.city || null,
+        province: formData.province || null,
+        status: formData.status,
+        notes: formData.notes || '',
+        locationUrl: formData.locationUrl || null,
+        assignedSeller: formData.assignedSeller || null,
+        lastContactAt: formData.lastContactAt || null,
+      }
+
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       })
 
-      if (!res.ok) throw new Error('Failed to save client')
+      if (!res.ok) {
+        let errText = ''
+        try {
+          const json = await res.json()
+          errText = json?.message || json?.error || JSON.stringify(json)
+        } catch (_e) {
+          errText = await res.text()
+        }
+        console.error('Save client failed:', res.status, errText)
+        throw new Error(errText || 'Failed to save client')
+      }
       onSuccess()
     } catch (error) {
       console.error('Error saving client:', error)

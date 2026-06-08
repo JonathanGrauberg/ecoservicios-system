@@ -7,6 +7,8 @@ export interface Client {
   email: string
   phone: string
   address: string
+  city?: string | null
+  province?: string | null
   notes: string
   createdAt: Date
   updatedAt: Date

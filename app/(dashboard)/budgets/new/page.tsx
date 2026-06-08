@@ -128,6 +128,8 @@ export default function NewBudgetPage() {
   const [clientType, setClientType] = useState('')
   const [clientPeopleCount, setClientPeopleCount] = useState<number | ''>('')
   const [clientUsageFrequency, setClientUsageFrequency] = useState('')
+  const [clientCity, setClientCity] = useState('')
+  const [clientProvince, setClientProvince] = useState('')
 
   const activeProducts = useMemo(() => products.filter((p) => p.active), [products])
   const activeSellers = useMemo(() => sellers.filter((s) => s.active), [sellers])
@@ -183,6 +185,8 @@ export default function NewBudgetPage() {
     setClientType((c as any).type ?? '')
     setClientPeopleCount((c as any).peopleCount ?? '')
     setClientUsageFrequency((c as any).usageFrequency ?? '')
+    setClientCity((c as any).city ?? '')
+    setClientProvince((c as any).province ?? '')
   }, [clientId, clients])
 
   /* ================================
@@ -407,6 +411,16 @@ export default function NewBudgetPage() {
                           onChange={(e) => setClientUsageFrequency(e.target.value)}
                           placeholder="Ej: fines de semana"
                         />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>Localidad</Label>
+                        <Input value={clientCity} onChange={(e) => setClientCity(e.target.value)} />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>Provincia</Label>
+                        <Input value={clientProvince} onChange={(e) => setClientProvince(e.target.value)} />
                       </div>
                     </div>
                   )}

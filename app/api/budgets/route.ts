@@ -136,6 +136,8 @@ export async function POST(request: Request) {
       if (typeof cu.type === 'string') upd.type = cu.type || null
       if (cu.peopleCount !== undefined) upd.peopleCount = cu.peopleCount === '' ? null : Number(cu.peopleCount)
       if (typeof cu.usageFrequency === 'string') upd.usageFrequency = cu.usageFrequency || null
+      if (typeof cu.city === 'string') upd.city = cu.city || null
+      if (typeof cu.province === 'string') upd.province = cu.province || null
 
       try {
         await prisma.client.update({ where: { id: data.clientId }, data: upd })
