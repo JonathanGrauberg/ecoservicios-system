@@ -36,16 +36,21 @@ export function ClientForm({ client, onSuccess, onCancel }: ClientFormProps) {
   email: client?.email || '',
   phone: client?.phone || '',
   address: client?.address || '',
+  city: (client as any)?.city || '',
+  province: (client as any)?.province || '',
   notes: client?.notes || '',
 
   // uso / clasificación
-  type: (client as any)?.type || '',
-  peopleCount: (client as any)?.peopleCount || '',
-  usageFrequency: (client as any)?.usageFrequency || '',
+  
   status: (client as any)?.status || 'nuevo',
 
   // 📍 ubicación simple
   locationUrl: (client as any)?.locationUrl || '',
+
+  // identificación
+  identificationType: (client as any)?.cuit ? 'empresa' : (client as any)?.dni ? 'persona' : '',
+  dni: (client as any)?.dni || '',
+  cuit: (client as any)?.cuit || '',
 
   // 🆕 seguimiento comercial
   assignedSeller: (client as any)?.assignedSeller || '',
@@ -121,6 +126,48 @@ export function ClientForm({ client, onSuccess, onCancel }: ClientFormProps) {
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
+            <Label>Tipo de identificación</Label>
+            <Select
+              value={formData.identificationType}
+              onValueChange={(v) => {
+                if (v === 'empresa' && !formData.cuit) {
+                  setFormData({ ...formData, identificationType: v, cuit: formData.dni || '', dni: '' })
+                } else if (v === 'persona' && !formData.dni) {
+                  setFormData({ ...formData, identificationType: v, dni: formData.cuit || '', cuit: '' })
+                } else {
+                  setFormData({ ...formData, identificationType: v })
+                }
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Seleccionar tipo" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="persona">Persona</SelectItem>
+                <SelectItem value="empresa">Empresa</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Documento</Label>
+            <Input
+              placeholder={formData.identificationType === 'empresa' ? 'CUIT' : 'DNI'}
+              value={formData.identificationType === 'empresa' ? formData.cuit : formData.dni}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  ...(formData.identificationType === 'empresa'
+                    ? { cuit: e.target.value, dni: '' }
+                    : { dni: e.target.value, cuit: '' }),
+                })
+              }
+            />
+          </div>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-2">
             <Label>Email</Label>
             <Input
               type="email"
@@ -152,6 +199,24 @@ export function ClientForm({ client, onSuccess, onCancel }: ClientFormProps) {
               setFormData({ ...formData, address: e.target.value })
             }
           />
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-2">
+            <Label>Localidad</Label>
+            <Input
+              value={formData.city}
+              onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Provincia</Label>
+            <Input
+              value={formData.province}
+              onChange={(e) => setFormData({ ...formData, province: e.target.value })}
+            />
+          </div>
         </div>
 
         {/* 📍 Ubicación en mapa */}
@@ -189,51 +254,7 @@ export function ClientForm({ client, onSuccess, onCancel }: ClientFormProps) {
           </div>
         </div>
 
-        {/* Tipo de cliente */}
-        <div className="space-y-2">
-          <Label>Tipo de Uso</Label>
-          <Select
-            value={formData.type}
-            onValueChange={(v) => setFormData({ ...formData, type: v })}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Seleccionar tipo" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="home">Casa</SelectItem>
-              <SelectItem value="home_modular">Casa Modular</SelectItem>
-              <SelectItem value="cabin">Cabaña</SelectItem>
-              <SelectItem value="hall">Salón</SelectItem>
-              <SelectItem value="sanitary">Sanitario</SelectItem>
-              <SelectItem value="company">Empresa</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* Uso */}
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-2">
-            <Label>Cantidad de personas</Label>
-            <Input
-              type="number"
-              value={formData.peopleCount}
-              onChange={(e) =>
-                setFormData({ ...formData, peopleCount: e.target.value })
-              }
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label>Frecuencia de uso</Label>
-            <Input
-              value={formData.usageFrequency}
-              onChange={(e) =>
-                setFormData({ ...formData, usageFrequency: e.target.value })
-              }
-              placeholder="Ej: fines de semana"
-            />
-          </div>
-        </div>
+        {/* (Uso moved to budgets new) */}
 
         {/* Estado del cliente */}
         <div className="space-y-2">

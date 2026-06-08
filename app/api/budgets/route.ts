@@ -129,6 +129,21 @@ export async function POST(request: Request) {
         ? data.installerId.trim()
         : null
 
+    // If clientUpdates are provided, update the client first (keeps schema unchanged)
+    if (data.clientUpdates && typeof data.clientUpdates === 'object') {
+      const cu: any = data.clientUpdates
+      const upd: any = {}
+      if (typeof cu.type === 'string') upd.type = cu.type || null
+      if (cu.peopleCount !== undefined) upd.peopleCount = cu.peopleCount === '' ? null : Number(cu.peopleCount)
+      if (typeof cu.usageFrequency === 'string') upd.usageFrequency = cu.usageFrequency || null
+
+      try {
+        await prisma.client.update({ where: { id: data.clientId }, data: upd })
+      } catch (e) {
+        console.error('Error updating client with clientUpdates:', e)
+      }
+    }
+
     const budget = await prisma.budget.create({
       data: {
         status: 'draft',

@@ -7,6 +7,7 @@ import { PageHeader } from '@/components/page-header'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import {
   Select,
@@ -124,6 +125,9 @@ export default function NewBudgetPage() {
   const [paymentTerms, setPaymentTerms] = useState('')
   const [validUntil, setValidUntil] = useState('')
   const [sellerId, setSellerId] = useState('')
+  const [clientType, setClientType] = useState('')
+  const [clientPeopleCount, setClientPeopleCount] = useState<number | ''>('')
+  const [clientUsageFrequency, setClientUsageFrequency] = useState('')
 
   const activeProducts = useMemo(() => products.filter((p) => p.active), [products])
   const activeSellers = useMemo(() => sellers.filter((s) => s.active), [sellers])
@@ -165,6 +169,21 @@ export default function NewBudgetPage() {
 
     setInstallerReference(buildInstallerReference(installer))
   }, [installationResponsible, installerId, activeInstallers])
+
+  useEffect(() => {
+    if (!clientId) {
+      setClientType('')
+      setClientPeopleCount('')
+      setClientUsageFrequency('')
+      return
+    }
+
+    const c = clients.find((x) => x.id === clientId)
+    if (!c) return
+    setClientType((c as any).type ?? '')
+    setClientPeopleCount((c as any).peopleCount ?? '')
+    setClientUsageFrequency((c as any).usageFrequency ?? '')
+  }, [clientId, clients])
 
   /* ================================
      ITEMS
@@ -264,6 +283,12 @@ export default function NewBudgetPage() {
           paymentTerms,
           validUntil,
 
+              clientUpdates: {
+                type: clientType || null,
+                peopleCount: clientPeopleCount === '' ? null : Number(clientPeopleCount),
+                usageFrequency: clientUsageFrequency || null,
+              },
+
           shippingCost: shippingIncluded ? safeShippingCost : null,
 
           items: items.map((i) => ({
@@ -347,6 +372,44 @@ export default function NewBudgetPage() {
                       </SelectContent>
                     </Select>
                   </div>
+                  {clientId && (
+                    <div className="grid gap-4 sm:grid-cols-3">
+                      <div className="space-y-2">
+                        <Label>Tipo de Uso</Label>
+                        <Select value={clientType} onValueChange={setClientType}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Seleccionar tipo" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="home">Casa</SelectItem>
+                            <SelectItem value="home_modular">Casa Modular</SelectItem>
+                            <SelectItem value="cabin">Cabaña</SelectItem>
+                            <SelectItem value="hall">Salón</SelectItem>
+                            <SelectItem value="sanitary">Sanitario</SelectItem>
+                            <SelectItem value="company">Empresa</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>Cantidad de personas</Label>
+                        <Input
+                          type="number"
+                          value={clientPeopleCount}
+                          onChange={(e) => setClientPeopleCount(Number(e.target.value) || '')}
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>Frecuencia de uso</Label>
+                        <Input
+                          value={clientUsageFrequency}
+                          onChange={(e) => setClientUsageFrequency(e.target.value)}
+                          placeholder="Ej: fines de semana"
+                        />
+                      </div>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
 
@@ -547,11 +610,15 @@ export default function NewBudgetPage() {
                       value={paymentTerms}
                       onChange={(e) => setPaymentTerms(e.target.value)}
                     />
-                    <Input
-                      type="date"
-                      value={validUntil}
-                      onChange={(e) => setValidUntil(e.target.value)}
-                    />
+
+                    <div className="space-y-2">
+                      <p className="mb-2 text-sm text-muted-foreground">Válido hasta:</p>
+                      <Input
+                        type="date"
+                        value={validUntil}
+                        onChange={(e) => setValidUntil(e.target.value)}
+                      />
+                    </div>
                   </div>
                 </CardContent>
               </Card>

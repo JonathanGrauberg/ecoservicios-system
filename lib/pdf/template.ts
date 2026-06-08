@@ -144,6 +144,7 @@ export function budgetPdfTemplate(
         <h1>Presupuesto</h1>
         <p class="muted">N° ${budget.id?.slice(0, 6) ?? ''}</p>
         <p class="muted">Fecha: ${budget.createdAt ? new Date(budget.createdAt).toLocaleDateString('es-AR') : '—'}</p>
+        <p class="muted">Válido hasta: ${budget.validUntil ? new Date(budget.validUntil).toLocaleDateString('es-AR') : '—'}</p>
       </div>
 
       <div class="header-right">
@@ -157,7 +158,9 @@ export function budgetPdfTemplate(
       Cliente: ${budget.client?.name ?? '—'}<br />
       Tel: ${budget.client?.phone || '—'}<br />
       Email: ${budget.client?.email || '—'}<br />
-      Dirección: ${budget.client?.address || '—'}
+      Dirección: ${budget.client?.address || '—'}<br />
+      Localidad: ${budget.client?.city ?? '—'}${budget.client?.province ? ' - ' + budget.client.province : ''}<br />
+      ${budget.client?.cuit ? `CUIT: ${budget.client.cuit}` : budget.client?.dni ? `DNI: ${budget.client.dni}` : 'DNI/CUIT: —'}
     </div>
 
     <h2>Detalle del Presupuesto</h2>
@@ -266,6 +269,10 @@ export function budgetPdfTemplate(
     `
         : ''
     }
+    
+    <div class="small muted" style="margin-top:12px;">
+      Los precios están expresados en pesos argentinos. No incluyen IVA
+    </div>
   </div>
 </body>
 </html>

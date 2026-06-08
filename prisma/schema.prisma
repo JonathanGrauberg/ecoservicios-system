@@ -61,6 +61,8 @@ model Client {
 
   // Dirección
   address   String
+  city      String?
+  province  String?
 
   // Ubicación
   latitude  Float?
